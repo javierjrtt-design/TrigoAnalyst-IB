@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrigoAnalyst IB - Círculo Unitario e Interactividad Trigonométrica</title>
+    <!-- Tailwind CSS para un diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para iconos limpios -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Encabezado Principal -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        TrigoAnalyst IB 
+                        <span class="text-xs bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-semibold px-2 py-0.5 rounded-full">Edición PD IB</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Visualización de Seno y Coseno en posición normal mediante reflexión geométrica</p>
+                </div>
+            </div>
+            <!-- Indicadores Rápidos -->
+            <div class="flex flex-wrap gap-3 justify-center text-xs">
+                <div class="px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+                    <span>Seno (Y)</span>
+                </div>
+                <div class="px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    <span>Coseno (X)</span>
+                </div>
+                <div class="px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span>Tangente (T)</span>
+                </div>
+                <div class="px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <span>Ángulo (θ)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Área del Canvas (Visualizador Gráfico Izquierda) -->
+        <div class="lg:col-span-7 flex flex-col bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-sm shadow-xl">
+            <!-- Barra de control del Canvas -->
+            <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex justify-between items-center">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> Proyecciones en Posición Normal
+                </span>
+                <span class="text-xs text-indigo-300 hidden sm:inline font-medium flex items-center gap-1">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i> El "espejo" a 45° refleja el Coseno (X) al eje vertical (Y)
+                </span>
+            </div>
+
+            <!-- Contenedor del Canvas con relación de aspecto mantenida -->
+            <div class="flex-1 relative flex items-center justify-center p-4 min-h-[400px] sm:min-h-[500px] md:min-h-[600px]">
+                <canvas id="mathCanvas" class="w-full max-w-[580px] aspect-square rounded-xl cursor-crosshair bg-slate-950/80 border border-slate-800/60 shadow-inner"></canvas>
+            </div>
+            
+            <!-- Panel de Simetría e Identidades de Reducción (Exclusivo IB) -->
+            <div class="p-5 border-t border-slate-800 bg-slate-950/30 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-3 bg-slate-900/40 rounded-xl border border-slate-800/60">
+                    <div class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Identidad Par/Impar</div>
+                    <div class="text-xs text-slate-400 mt-1">cos(-θ) = cos(θ)</div>
+                    <div id="idPar" class="font-mono text-sm text-slate-200 mt-1">cos(-θ) = 0.71</div>
+                </div>
+                <div class="p-3 bg-slate-900/40 rounded-xl border border-slate-800/60">
+                    <div class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Simetría Cuadrante II</div>
+                    <div class="text-xs text-slate-400 mt-1">sen(π - θ) = sen(θ)</div>
+                    <div id="idSim" class="font-mono text-sm text-slate-200 mt-1">sen(π - θ) = 0.71</div>
+                </div>
+                <div class="p-3 bg-slate-900/40 rounded-xl border border-slate-800/60">
+                    <div class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Periodicidad</div>
+                    <div class="text-xs text-slate-400 mt-1">sen(θ + 2π) = sen(θ)</div>
+                    <div id="idPer" class="font-mono text-sm text-slate-200 mt-1">sen(θ + 2π) = 0.71</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Control y Teoría (Derecha) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Controles Interactivos -->
+            <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-4">
+                <h2 class="text-md font-bold text-slate-200 flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> Controles e Interacción
+                </h2>
+
+                <!-- Control Deslizante de Ángulo -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="angleSlider" class="text-sm font-medium text-slate-300">Ángulo manual (θ)</label>
+                        <div class="flex gap-1">
+                            <button id="btnMinus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 font-mono text-xs">-1°</button>
+                            <span id="angleText" class="text-xs bg-slate-800 px-2.5 py-1 rounded border border-slate-700 font-mono text-amber-400 min-w-[70px] text-center">0.00 rad</span>
+                            <button id="btnPlus" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 font-mono text-xs">+1°</button>
+                        </div>
+                    </div>
+                    <input type="range" id="angleSlider" min="0" max="360" step="0.5" value="45" 
+                           class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500 hover:bg-slate-700 transition">
+                </div>
+
+                <!-- Selector de Ángulos Notables -->
+                <div class="space-y-1.5">
+                    <span class="text-xs text-slate-400 block font-medium">Ángulos Notables Rápidos (Prueba 1)</span>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="0">0 (0°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="30">π/6 (30°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="45">π/4 (45°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="60">π/3 (60°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="90">π/2 (90°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="120">2π/3 (120°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="180">π (180°)</button>
+                        <button class="btn-preset text-xs py-1 px-1 bg-slate-800/80 hover:bg-indigo-950 hover:text-indigo-300 rounded border border-slate-700/60 font-mono text-center transition" data-angle="270">3π/2 (270°)</button>
+                    </div>
+                </div>
+
+                <!-- Animación Automática -->
+                <div class="flex items-center justify-between pt-2 border-t border-slate-800/60">
+                    <span class="text-xs font-medium text-slate-300">Animación Automática</span>
+                    <div class="flex gap-2">
+                        <button id="btnPlayPause" class="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all shadow-lg flex items-center justify-center">
+                            <i data-lucide="pause" id="playIcon" class="w-4 h-4"></i>
+                        </button>
+                        <button id="btnReset" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all border border-slate-700 flex items-center justify-center" title="Reiniciar a 0°">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Opciones de Visualización -->
+                <div class="pt-3 border-t border-slate-800/60 grid grid-cols-2 gap-2 text-xs">
+                    <label for="chkTraces" class="text-slate-300 cursor-pointer flex items-center gap-2">
+                        <input type="checkbox" id="chkTraces" checked class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500/20 bg-slate-800 w-3.5 h-3.5">
+                        Líneas guía de proyección
+                    </label>
+                    <label for="chkGrid" class="text-slate-300 cursor-pointer flex items-center gap-2">
+                        <input type="checkbox" id="chkGrid" checked class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500/20 bg-slate-800 w-3.5 h-3.5">
+                        Rejilla de fondo
+                    </label>
+                    <label for="chkTangent" class="text-slate-300 cursor-pointer flex items-center gap-2 col-span-2">
+                        <input type="checkbox" id="chkTangent" checked class="rounded border-slate-700 text-emerald-600 focus:ring-emerald-500/20 bg-slate-800 w-3.5 h-3.5">
+                        Ver Tangente en círculo
+                    </label>
+                </div>
+            </div>
+
+            <!-- Panel de Valores Exactos e IB -->
+            <div class="p-5 bg-indigo-950/15 border border-indigo-900/40 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-indigo-900/30 pb-2">
+                    <h2 class="text-sm font-bold text-indigo-300 flex items-center gap-1.5">
+                        <i data-lucide="hash" class="w-4 h-4"></i> Valor Exacto (Prueba sin Calculadora)
+                    </h2>
+                    <span id="exactBadge" class="text-[10px] px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-300 font-semibold uppercase tracking-wider">Ángulo Notable</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 font-mono text-center">
+                    <div class="p-2 bg-slate-950/80 rounded-lg border border-slate-850">
+                        <div class="text-[9px] text-slate-500 uppercase">sen(θ)</div>
+                        <div id="exactSin" class="text-cyan-400 font-bold text-sm mt-1">√2 / 2</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/80 rounded-lg border border-slate-850">
+                        <div class="text-[9px] text-slate-500 uppercase">cos(θ)</div>
+                        <div id="exactCos" class="text-rose-400 font-bold text-sm mt-1">√2 / 2</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/80 rounded-lg border border-slate-850">
+                        <div class="text-[9px] text-slate-500 uppercase">tan(θ)</div>
+                        <div id="exactTan" class="text-emerald-400 font-bold text-sm mt-1">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Análisis de Cuadrantes, Signos e Identidad -->
+            <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
+                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                        <i data-lucide="compass" class="w-4.5 h-4.5 text-amber-500"></i> Cuadrante & Pitágoras
+                    </h2>
+                    <span id="txtQuadrant" class="text-xs px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 font-semibold uppercase tracking-wider">Cuadrante I</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="p-2 bg-slate-950/40 rounded-lg border border-slate-800/60">
+                        <div class="text-[10px] text-slate-500 uppercase">Seno</div>
+                        <div id="signSin" class="font-bold text-cyan-400 text-xs">+ Positivo</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/40 rounded-lg border border-slate-800/60">
+                        <div class="text-[10px] text-slate-500 uppercase">Coseno</div>
+                        <div id="signCos" class="font-bold text-rose-400 text-xs">+ Positivo</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/40 rounded-lg border border-slate-800/60">
+                        <div class="text-[10px] text-slate-500 uppercase">Tangente</div>
+                        <div id="signTan" class="font-bold text-emerald-400 text-xs">+ Positivo</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 text-center font-mono mt-1">
+                    <div class="text-[10px] text-slate-400 mb-0.5">sen²(θ) + cos²(θ) = 1</div>
+                    <div class="text-xs flex items-center justify-center gap-1">
+                        <span id="calcSinSq" class="text-cyan-400">0.50</span> + 
+                        <span id="calcCosSq" class="text-rose-400">0.50</span> = 
+                        <span class="text-emerald-400 font-bold">1.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Funciones Trigonométricas Recíprocas -->
+            <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-3">
+                <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <i data-lucide="infinity" class="w-4.5 h-4.5 text-pink-400"></i> Funciones Recíprocas
+                </h2>
+                <div class="grid grid-cols-3 gap-2 font-mono text-center text-xs">
+                    <div class="p-2 bg-slate-950/50 rounded-xl border border-slate-850">
+                        <div class="text-[9px] text-slate-500">Cosecante</div>
+                        <div class="text-[10px] text-indigo-300 mt-0.5">csc θ = 1/sen</div>
+                        <div id="valCsc" class="text-sm font-bold text-indigo-400 mt-1">1.4142</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/50 rounded-xl border border-slate-850">
+                        <div class="text-[9px] text-slate-500">Secante</div>
+                        <div class="text-[10px] text-indigo-300 mt-0.5">sec θ = 1/cos</div>
+                        <div id="valSec" class="text-sm font-bold text-indigo-400 mt-1">1.4142</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/50 rounded-xl border border-slate-850">
+                        <div class="text-[9px] text-slate-500">Cotangente</div>
+                        <div class="text-[10px] text-indigo-300 mt-0.5">cot θ = 1/tan</div>
+                        <div id="valCot" class="text-sm font-bold text-indigo-400 mt-1">1.0000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini-Simulador de Examen IB (Exclusivo) -->
+            <div id="quizContainer" class="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-3 border-l-4 border-l-indigo-500">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                        <i data-lucide="award" class="w-4.5 h-4.5 text-indigo-400"></i> Reto Formativo Estilo IB
+                    </h2>
+                    <span class="text-[9px] bg-indigo-500/10 text-indigo-300 px-1.5 py-0.5 rounded font-bold uppercase">Formulario</span>
+                </div>
+                
+                <div id="quizQuestionBox" class="text-xs text-slate-300 space-y-2 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60">
+                    <p id="quizQuestionText" class="leading-relaxed font-semibold">Cargando pregunta...</p>
+                    <div id="quizOptions" class="grid grid-cols-2 gap-2 pt-2">
+                        <!-- Opciones dinámicas -->
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[10px]">
+                    <span id="quizFeedback" class="font-medium text-slate-400">Haz tu elección</span>
+                    <button id="btnNextQuiz" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded transition font-medium">Siguiente Pregunta</button>
+                </div>
+            </div>
+
+            <!-- Panel de Datos Numéricos Completo -->
+            <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl backdrop-blur-sm shadow-xl flex flex-col gap-4">
+                <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-4.5 h-4.5 text-indigo-300"></i> Coordenadas e Indicadores
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2 bg-slate-950/60 border border-slate-850 rounded-lg">
+                        <div class="text-[10px] text-slate-500">Ángulo (Grados)</div>
+                        <div id="valDeg" class="text-sm font-bold text-amber-500 code-font">45.0°</div>
+                    </div>
+                    <div class="p-2 bg-slate-950/60 border border-slate-850 rounded-lg">
+                        <div class="text-[10px] text-slate-500">Ángulo (Radianes)</div>
+                        <div id="valRad" class="text-sm font-bold text-amber-400 code-font">0.79π</div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 bg-slate-950/60 border border-slate-850 rounded-xl flex justify-between items-center text-xs">
+                    <span class="text-slate-400">Punto en circunferencia: P(cos θ, sen θ)</span>
+                    <span id="coordText" class="font-semibold text-indigo-300 code-font">(0.71, 0.71)</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="mt-auto border-t border-slate-900 py-4 px-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto">
+            TrigoAnalyst IB desarrollado por Javier Trigoso con fines educativos • 2026
+        </div>
+    </footer>
+
+    <!-- Lógica de control y renderizado del canvas -->
+    <script>
+        // Variables globales para la simulación
+        let canvas, ctx;
+        let angleSlider, speedSlider, angleText, speedVal;
+        let btnPlayPause, playIcon, btnReset;
+        let chkTraces, chkGrid, chkTangent;
+        let btnMinus, btnPlus, btnPresets;
+        let txtQuadrant, signSin, signCos, signTan;
+        let calcSinSq, calcCosSq;
+        let valDeg, valRad, coordText;
+        let valCsc, valSec, valCot;
+        let idPar, idSim, idPer;
+        let exactBadge, exactSin, exactCos, exactTan;
+        let quizQuestionText, quizOptions, quizFeedback, btnNextQuiz;
+
+        let angle = Math.PI / 4; // Empezamos en 45 grados (en radianes)
+        let isPlaying = true;
+        let speedMultiplier = 1.0;
+        let isDragging = false;
+
+        // Configuración de dimensiones fijas del lienzo virtual para consistencia
+        const WIDTH = 580;
+        const HEIGHT = 580;
+
+        // Geometría del diseño de la simulación
+        const circleCenter = { x: 150, y: 160 };
+        const circleRadius = 80; 
+
+        // Gráfico del Seno (Derecha superior) - Posición Normal
+        const sineGraph = {
+            startX: 290,
+            endX: 560,
+            centerY: 160, 
+            width: 270,
+            height: 80 
+        };
+
+        // Gráfico del Coseno (Derecha inferior) - Posición Normal
+        const cosineGraph = {
+            startX: 290,
+            endX: 560,
+            centerY: 440, 
+            width: 270,
+            height: 80 
+        };
+
+        // Centro del espejo de reflexión geométrica
+        const reflectionCenter = { x: circleCenter.x, y: cosineGraph.centerY };
+
+        // --- MAPEO DE ÁNGULOS NOTABLES (SISTEMA PD IB) ---
+        const notableAngles = [
+            { deg: 0, radStr: "0", sin: "0", cos: "1", tan: "0" },
+            { deg: 30, radStr: "π/6", sin: "1/2", cos: "√3 / 2", tan: "√3 / 3" },
+            { deg: 45, radStr: "π/4", sin: "√2 / 2", cos: "√2 / 2", tan: "1" },
+            { deg: 60, radStr: "π/3", sin: "√3 / 2", cos: "1/2", tan: "√3" },
+            { deg: 90, radStr: "π/2", sin: "1", cos: "0", tan: "No def." },
+            { deg: 120, radStr: "2π/3", sin: "√3 / 2", cos: "-1/2", tan: "-√3" },
+            { deg: 135, radStr: "3π/4", sin: "√2 / 2", cos: "-√2 / 2", tan: "-1" },
+            { deg: 150, radStr: "5π/6", sin: "1/2", cos: "-√3 / 2", tan: "-√3 / 3" },
+            { deg: 180, radStr: "π", sin: "0", cos: "-1", tan: "0" },
+            { deg: 210, radStr: "7π/6", sin: "-1/2", cos: "-√3 / 2", tan: "√3 / 3" },
+            { deg: 225, radStr: "5π/4", sin: "-√2 / 2", cos: "-√2 / 2", tan: "1" },
+            { deg: 240, radStr: "4π/3", sin: "-√3 / 2", cos: "-1/2", tan: "√3" },
+            { deg: 270, radStr: "3π/2", sin: "-1", cos: "0", tan: "No def." },
+            { deg: 300, radStr: "5π/3", sin: "-√3 / 2", cos: "1/2", tan: "-√3" },
+            { deg: 315, radStr: "7π/4", sin: "-√2 / 2", cos: "√2 / 2", tan: "-1" },
+            { deg: 330, radStr: "11π/6", sin: "-1/2", cos: "√3 / 2", tan: "-√3 / 3" },
+            { deg: 360, radStr: "2π", sin: "0", cos: "1", tan: "0" }
+        ];
+
+        // --- SISTEMA DE PREGUNTAS AUTOEVALUACIÓN IB ---
+        const quizBank = [
+            {
+                q: "Si θ está en el Cuadrante II y sen(θ) = 1/2, ¿cuál es el valor exacto de cos(θ)?",
+                options: ["-1/2", "-√3 / 2", "√3 / 2", "-√2 / 2"],
+                answer: "-√3 / 2"
+            },
+            {
+                q: "Halla el valor exacto de la cosecante (csc θ) si θ = 5π/6.",
+                options: ["2", "-2", "√2", "2 / √3"],
+                answer: "2"
+            },
+            {
+                q: "Si tan(θ) = -1 y θ está en el Cuadrante IV, ¿cuál es el valor del ángulo en radianes?",
+                options: ["3π/4", "5π/4", "7π/4", "11π/6"],
+                answer: "7π/4"
+            },
+            {
+                q: "Dada la identidad pitagórica, si cos(θ) = -4/5 y sen(θ) < 0, calcula sen(θ).",
+                options: ["-3/5", "3/5", "-1/5", "-9/25"],
+                answer: "-3/5"
+            },
+            {
+                q: "¿Qué función recíproca trigonométrica no está definida en θ = π/2?",
+                options: ["Cosecante (csc)", "Secante (sec)", "Cotangente (cot)", "Seno (sen)"],
+                answer: "Secante (sec)"
+            }
+        ];
+
+        let currentQuizIndex = 0;
+
+        // Aseguramos que el DOM esté completamente cargado
+        window.onload = function () {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            canvas = document.getElementById('mathCanvas');
+            ctx = canvas ? canvas.getContext('2d') : null;
+            if (canvas) {
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+            }
+
+            angleSlider = document.getElementById('angleSlider');
+            speedSlider = document.getElementById('speedSlider');
+            angleText = document.getElementById('angleText');
+            speedVal = document.getElementById('speedVal');
+            btnPlayPause = document.getElementById('btnPlayPause');
+            playIcon = document.getElementById('playIcon');
+            btnReset = document.getElementById('btnReset');
+            chkTraces = document.getElementById('chkTraces');
+            chkGrid = document.getElementById('chkGrid');
+            chkTangent = document.getElementById('chkTangent');
+
+            btnMinus = document.getElementById('btnMinus');
+            btnPlus = document.getElementById('btnPlus');
+            btnPresets = document.querySelectorAll('.btn-preset');
+
+            txtQuadrant = document.getElementById('txtQuadrant');
+            signSin = document.getElementById('signSin');
+            signCos = document.getElementById('signCos');
+            signTan = document.getElementById('signTan');
+
+            calcSinSq = document.getElementById('calcSinSq');
+            calcCosSq = document.getElementById('calcCosSq');
+
+            valDeg = document.getElementById('valDeg');
+            valRad = document.getElementById('valRad');
+            coordText = document.getElementById('coordText');
+
+            valCsc = document.getElementById('valCsc');
+            valSec = document.getElementById('valSec');
+            valCot = document.getElementById('valCot');
+
+            idPar = document.getElementById('idPar');
+            idSim = document.getElementById('idSim');
+            idPer = document.getElementById('idPer');
+
+            exactBadge = document.getElementById('exactBadge');
+            exactSin = document.getElementById('exactSin');
+            exactCos = document.getElementById('exactCos');
+            exactTan = document.getElementById('exactTan');
+
+            quizQuestionText = document.getElementById('quizQuestionText');
+            quizOptions = document.getElementById('quizOptions');
+            quizFeedback = document.getElementById('quizFeedback');
+            btnNextQuiz = document.getElementById('btnNextQuiz');
+
+            // Asignar manejadores de eventos
+            if (angleSlider) {
+                angleSlider.addEventListener('input', (e) => {
+                    angle = (parseFloat(e.target.value) * Math.PI) / 180;
+                    updateValueUI();
+                });
+            }
+
+            if (speedSlider) {
+                speedSlider.addEventListener('input', (e) => {
+                    speedMultiplier = parseFloat(e.target.value);
+                    if (speedVal) {
+                        if (speedMultiplier === 1) speedVal.textContent = "Normal";
+                        else if (speedMultiplier < 1) speedVal.textContent = "Lento";
+                        else speedVal.textContent = "Rápido";
+                    }
+                });
+            }
+
+            if (btnMinus) {
+                btnMinus.addEventListener('click', () => {
+                    isPlaying = false;
+                    if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    let deg = (angle * 180 / Math.PI) - 1;
+                    if (deg < 0) deg += 360;
+                    angle = (deg * Math.PI) / 180;
+                    if (angleSlider) angleSlider.value = deg.toFixed(1);
+                    updateValueUI();
+                });
+            }
+
+            if (btnPlus) {
+                btnPlus.addEventListener('click', () => {
+                    isPlaying = false;
+                    if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    let deg = (angle * 180 / Math.PI) + 1;
+                    if (deg >= 360) deg -= 360;
+                    angle = (deg * Math.PI) / 180;
+                    if (angleSlider) angleSlider.value = deg.toFixed(1);
+                    updateValueUI();
+                });
+            }
+
+            if (btnPresets) {
+                btnPresets.forEach(button => {
+                    button.addEventListener('click', () => {
+                        isPlaying = false;
+                        if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        const targetDeg = parseFloat(button.getAttribute('data-angle'));
+                        angle = (targetDeg * Math.PI) / 180;
+                        if (angleSlider) angleSlider.value = targetDeg;
+                        updateValueUI();
+                    });
+                });
+            }
+
+            if (btnPlayPause) {
+                btnPlayPause.addEventListener('click', () => {
+                    isPlaying = !isPlaying;
+                    if (playIcon) {
+                        if (isPlaying) {
+                            playIcon.setAttribute('data-lucide', 'pause');
+                        } else {
+                            playIcon.setAttribute('data-lucide', 'play');
+                        }
+                    }
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+            }
+
+            if (btnReset) {
+                btnReset.addEventListener('click', () => {
+                    angle = 0;
+                    if (angleSlider) angleSlider.value = 0;
+                    updateValueUI();
+                });
+            }
+
+            if (canvas) {
+                canvas.addEventListener('mousedown', handleStart);
+                canvas.addEventListener('touchstart', handleStart, { passive: false });
+            }
+
+            window.addEventListener('mousemove', handleDrag);
+            window.addEventListener('mouseup', handleEnd);
+            window.addEventListener('touchmove', handleDrag, { passive: false });
+            window.addEventListener('touchend', handleEnd);
+
+            if (btnNextQuiz) {
+                btnNextQuiz.addEventListener('click', () => {
+                    currentQuizIndex = (currentQuizIndex + 1) % quizBank.length;
+                    loadQuizQuestion();
+                });
+            }
+
+            // Cargar estado inicial
+            updateValueUI();
+            loadQuizQuestion();
+
+            // Iniciar el bucle de animación
+            requestAnimationFrame(draw);
+        };
+
+        function getMousePos(canvasDom, evt) {
+            if (!canvasDom) return { x: 0, y: 0 };
+            const rect = canvasDom.getBoundingClientRect();
+            return {
+                x: ((evt.clientX - rect.left) / rect.width) * WIDTH,
+                y: ((evt.clientY - rect.top) / rect.height) * HEIGHT
+            };
+        }
+
+        function handleStart(e) {
+            if (!canvas) return;
+            const pos = getMousePos(canvas, e.touches ? e.touches[0] : e);
+            const dx = pos.x - circleCenter.x;
+            const dy = pos.y - circleCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < circleRadius + 28) {
+                isDragging = true;
+                isPlaying = false;
+                if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                handleDrag(e);
+            }
+        }
+
+        function handleDrag(e) {
+            if (!isDragging || !canvas) return;
+            e.preventDefault();
+            const pos = getMousePos(canvas, e.touches ? e.touches[0] : e);
+            const dx = pos.x - circleCenter.x;
+            const dy = circleCenter.y - pos.y; 
+
+            let newAngle = Math.atan2(dy, dx);
+            if (newAngle < 0) {
+                newAngle += 2 * Math.PI;
+            }
+            angle = newAngle;
+            
+            const degrees = (angle * 180) / Math.PI;
+            if (angleSlider) angleSlider.value = degrees.toFixed(1);
+            updateValueUI();
+        }
+
+        function handleEnd() {
+            isDragging = false;
+        }
+
+        // Actualizar interfaz con datos trigonométricos
+        function updateValueUI() {
+            const degRaw = (angle * 180) / Math.PI;
+            const deg = (degRaw % 360 + 360) % 360; 
+            const sinVal = Math.sin(angle);
+            const cosVal = Math.cos(angle);
+            const tanVal = Math.abs(cosVal) < 1e-10 ? (sinVal > 0 ? Infinity : -Infinity) : sinVal / cosVal;
+
+            if (angleText) angleText.textContent = `${angle.toFixed(2)} rad`;
+            if (valDeg) valDeg.textContent = `${deg.toFixed(1)}°`;
+            if (valRad) valRad.textContent = `${(deg / 180).toFixed(2)}π`;
+            if (coordText) coordText.textContent = `(${cosVal.toFixed(2)}, ${sinVal.toFixed(2)})`;
+
+            const sinSq = sinVal * sinVal;
+            const cosSq = cosVal * cosVal;
+            if (calcSinSq) calcSinSq.textContent = sinSq.toFixed(2);
+            if (calcCosSq) calcCosSq.textContent = cosSq.toFixed(2);
+
+            // Valores de recíprocas
+            if (valCsc) valCsc.textContent = Math.abs(sinVal) < 1e-10 ? "Indef." : (1 / sinVal).toFixed(4);
+            if (valSec) valSec.textContent = Math.abs(cosVal) < 1e-10 ? "Indef." : (1 / cosVal).toFixed(4);
+            if (valCot) valCot.textContent = Math.abs(tanVal) === Infinity || Math.abs(tanVal) < 1e-10 ? (Math.abs(tanVal) === Infinity ? "0.0000" : "Indef.") : (1 / tanVal).toFixed(4);
+
+            // Identidades
+            if (idPar) idPar.textContent = `cos(-θ) = ${cosVal.toFixed(2)}`;
+            if (idSim) idSim.textContent = `sen(π - θ) = ${sinVal.toFixed(2)}`;
+            if (idPer) idPer.textContent = `sen(θ + 2π) = ${sinVal.toFixed(2)}`;
+
+            // Identificación y despliegue del Valor Radical Exacto
+            let matchingNotable = notableAngles.find(n => Math.abs(n.deg - deg) < 1.5);
+            if (matchingNotable) {
+                if (exactBadge) {
+                    exactBadge.textContent = `Not. ${matchingNotable.radStr}`;
+                    exactBadge.className = "text-[10px] px-2 py-0.5 bg-emerald-500/15 border border-emerald-500/30 rounded-full text-emerald-400 font-bold uppercase tracking-wider animate-pulse";
+                }
+                if (exactSin) exactSin.textContent = matchingNotable.sin;
+                if (exactCos) exactCos.textContent = matchingNotable.cos;
+                if (exactTan) exactTan.textContent = matchingNotable.tan;
+            } else {
+                if (exactBadge) {
+                    exactBadge.textContent = "Sin valor radical";
+                    exactBadge.className = "text-[10px] px-2 py-0.5 bg-slate-800 border border-slate-700/60 rounded-full text-slate-400 font-medium uppercase tracking-wider";
+                }
+                if (exactSin) exactSin.textContent = sinVal.toFixed(3);
+                if (exactCos) exactCos.textContent = cosVal.toFixed(3);
+                if (exactTan) exactTan.textContent = isFinite(tanVal) ? tanVal.toFixed(3) : "No def.";
+            }
+
+            // Clasificación de Cuadrante
+            let quadrantName = "";
+            let sinSign = "";
+            let cosSign = "";
+            let tanSign = "";
+
+            if (deg >= 0 && deg < 90) {
+                quadrantName = "Cuadrante I";
+                sinSign = "+ Positivo";
+                cosSign = "+ Positivo";
+                tanSign = "+ Positivo";
+                if (txtQuadrant) txtQuadrant.className = "text-xs px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 font-semibold uppercase tracking-wider";
+            } else if (deg >= 90 && deg < 180) {
+                quadrantName = "Cuadrante II";
+                sinSign = "+ Positivo";
+                cosSign = "- Negativo";
+                tanSign = "- Negativo";
+                if (txtQuadrant) txtQuadrant.className = "text-xs px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 font-semibold uppercase tracking-wider";
+            } else if (deg >= 180 && deg < 270) {
+                quadrantName = "Cuadrante III";
+                sinSign = "- Negativo";
+                cosSign = "- Negativo";
+                tanSign = "+ Positivo";
+                if (txtQuadrant) txtQuadrant.className = "text-xs px-2 py-0.5 bg-rose-500/10 border border-rose-500/30 rounded-full text-rose-400 font-semibold uppercase tracking-wider";
+            } else {
+                quadrantName = "Cuadrante IV";
+                sinSign = "- Negativo";
+                cosSign = "+ Positivo";
+                tanSign = "- Negativo";
+                if (txtQuadrant) txtQuadrant.className = "text-xs px-2 py-0.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 font-semibold uppercase tracking-wider";
+            }
+
+            if (txtQuadrant) txtQuadrant.textContent = quadrantName;
+            
+            if (signSin) {
+                signSin.textContent = sinSign;
+                signSin.className = `font-bold text-xs ${sinSign.startsWith('+') ? 'text-cyan-400' : 'text-slate-500'}`;
+            }
+            if (signCos) {
+                signCos.textContent = cosSign;
+                signCos.className = `font-bold text-xs ${cosSign.startsWith('+') ? 'text-rose-400' : 'text-slate-500'}`;
+            }
+            if (signTan) {
+                signTan.textContent = tanSign;
+                signTan.className = `font-bold text-xs ${tanSign.startsWith('+') ? 'text-emerald-400' : 'text-slate-500'}`;
+            }
+        }
+
+        function drawArrow(ctx, fromX, fromY, toX, toY, color = '#64748b') {
+            const headlen = 8; 
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Bucle de renderizado
+        function draw() {
+            if (!canvas || !ctx) {
+                requestAnimationFrame(draw);
+                return;
+            }
+
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            ctx.fillStyle = '#020617'; 
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+            const showGrid = chkGrid ? chkGrid.checked : true;
+            const showTraces = chkTraces ? chkTraces.checked : true;
+            const showTangent = chkTangent ? chkTangent.checked : true;
+
+            if (isPlaying && !isDragging) {
+                const step = 0.012 * speedMultiplier;
+                angle = (angle + step) % (2 * Math.PI);
+                if (angleSlider) angleSlider.value = ((angle * 180) / Math.PI).toFixed(1);
+                updateValueUI();
+            }
+
+            const cosTheta = Math.cos(angle);
+            const sinTheta = Math.sin(angle);
+
+            const circleX = circleCenter.x + circleRadius * cosTheta;
+            const circleY = circleCenter.y - circleRadius * sinTheta;
+
+            // 1. REJILLA DEL FONDO
+            if (showGrid) {
+                ctx.strokeStyle = '#1e293b'; 
+                ctx.lineWidth = 0.5;
+
+                for (let i = 30; i < WIDTH; i += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, HEIGHT);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(WIDTH, i);
+                    ctx.stroke();
+                }
+            }
+
+            // Separación visual
+            ctx.strokeStyle = '#1e293b'; 
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(270, 0); ctx.lineTo(270, HEIGHT);
+            ctx.moveTo(0, 310); ctx.lineTo(270, 310); 
+            ctx.stroke();
+
+            // 2. DIBUJAR CÍRCULO UNITARIO
+            drawArrow(ctx, 30, circleCenter.y, 250, circleCenter.y, '#475569'); 
+            drawArrow(ctx, circleCenter.x, 250, circleCenter.x, 30, '#475569'); 
+
+            ctx.font = '11px sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText("x (cos)", 230, circleCenter.y - 8);
+            ctx.fillText("y (sen)", circleCenter.x + 8, 40);
+
+            // Circunferencia
+            ctx.beginPath();
+            ctx.arc(circleCenter.x, circleCenter.y, circleRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#4f46e5'; 
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Círculo concéntrico de referencia
+            ctx.beginPath();
+            ctx.arc(circleCenter.x, circleCenter.y, circleRadius / 2, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.fillStyle = '#475569';
+            ctx.fillText("0.5", circleCenter.x + circleRadius / 2 - 8, circleCenter.y + 12);
+            ctx.fillText("1.0", circleCenter.x + circleRadius - 8, circleCenter.y + 12);
+
+            // Ángulo coloreado
+            ctx.beginPath();
+            ctx.moveTo(circleCenter.x, circleCenter.y);
+            ctx.arc(circleCenter.x, circleCenter.y, 25, 0, -angle, true);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.15)'; 
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(circleCenter.x, circleCenter.y, 25, 0, -angle, true);
+            ctx.strokeStyle = '#f59e0b'; 
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+            
+            ctx.font = '13px serif';
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillText("θ", circleCenter.x + 32 * cosTheta - 3, circleCenter.y - 10 * sinTheta);
+
+            // Proyecciones: Coseno (rojo), Seno (azul)
+            ctx.beginPath();
+            ctx.moveTo(circleCenter.x, circleCenter.y);
+            ctx.lineTo(circleX, circleCenter.y);
+            ctx.strokeStyle = '#f43f5e'; 
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(circleX, circleCenter.y);
+            ctx.lineTo(circleX, circleY);
+            ctx.strokeStyle = '#06b6d4'; 
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Tangente Geométrica
+            if (showTangent) {
+                const tangentPointX = circleCenter.x + circleRadius;
+                const tanValue = sinTheta / (cosTheta || 1e-10);
+                
+                if (Math.abs(tanValue) < 4) {
+                    const tangentY = circleCenter.y - circleRadius * tanValue;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(tangentPointX, circleCenter.y);
+                    ctx.lineTo(tangentPointX, tangentY);
+                    ctx.strokeStyle = '#10b981'; 
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(circleCenter.x, circleCenter.y);
+                    ctx.lineTo(tangentPointX, tangentY);
+                    ctx.strokeStyle = '#475569'; 
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+
+            // Hipotenusa
+            ctx.beginPath();
+            ctx.moveTo(circleCenter.x, circleCenter.y);
+            ctx.lineTo(circleX, circleY);
+            ctx.strokeStyle = '#ffffff'; 
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Punto interactivo
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, 7.5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#f59e0b'; 
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. ESPEJO DE REFLEXIÓN GEOMÉTRICA A 45°
+            const diagonalHalfSize = circleRadius + 15;
+            const startDiag = { x: reflectionCenter.x - diagonalHalfSize, y: reflectionCenter.y + diagonalHalfSize };
+            const endDiag = { x: reflectionCenter.x + diagonalHalfSize, y: reflectionCenter.y - diagonalHalfSize };
+
+            ctx.strokeStyle = '#a5b4fc'; 
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(startDiag.x, startDiag.y);
+            ctx.lineTo(endDiag.x, endDiag.y);
+            ctx.stroke();
+
+            ctx.font = '10px sans-serif';
+            ctx.fillStyle = '#818cf8';
+            ctx.fillText("Espejo de reflexión a 45°", startDiag.x - 5, startDiag.y + 12);
+            ctx.fillText("(y = -x)", endDiag.x - 38, endDiag.y - 8);
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(reflectionCenter.x - diagonalHalfSize, reflectionCenter.y);
+            ctx.lineTo(reflectionCenter.x + diagonalHalfSize, reflectionCenter.y);
+            ctx.moveTo(reflectionCenter.x, reflectionCenter.y - diagonalHalfSize);
+            ctx.moveTo(reflectionCenter.x, reflectionCenter.y + diagonalHalfSize);
+            ctx.stroke();
+
+            // 4. GRAFICA DE LA FUNCIÓN SENO (DERECHA - ARRIBA)
+            drawArrow(ctx, sineGraph.startX - 10, sineGraph.centerY, sineGraph.endX + 15, sineGraph.centerY, '#475569'); 
+            drawArrow(ctx, sineGraph.startX, sineGraph.centerY + sineGraph.height + 10, sineGraph.startX, sineGraph.centerY - sineGraph.height - 10, '#475569'); 
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(sineGraph.startX, sineGraph.centerY - sineGraph.height);
+            ctx.lineTo(sineGraph.endX, sineGraph.centerY - sineGraph.height);
+            ctx.moveTo(sineGraph.startX, sineGraph.centerY + sineGraph.height);
+            ctx.lineTo(sineGraph.endX, sineGraph.centerY + sineGraph.height);
+            ctx.stroke();
+
+            ctx.font = '9px sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText("1", sineGraph.startX - 10, sineGraph.centerY - sineGraph.height + 3);
+            ctx.fillText("-1", sineGraph.startX - 14, sineGraph.centerY + sineGraph.height + 3);
+            ctx.fillText("π", sineGraph.startX + sineGraph.width / 2 - 3, sineGraph.centerY + 12);
+            ctx.fillText("2π", sineGraph.startX + sineGraph.width - 6, sineGraph.centerY + 12);
+
+            // Curva de fondo
+            ctx.beginPath();
+            for (let x = 0; x <= sineGraph.width; x++) {
+                const stepAngle = (x / sineGraph.width) * 2 * Math.PI;
+                const plotY = sineGraph.centerY - Math.sin(stepAngle) * sineGraph.height;
+                if (x === 0) ctx.moveTo(sineGraph.startX, plotY);
+                else ctx.lineTo(sineGraph.startX + x, plotY);
+            }
+            ctx.strokeStyle = '#083344'; 
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Curva activa
+            const currentSineWidth = (angle / (2 * Math.PI)) * sineGraph.width;
+            ctx.beginPath();
+            for (let x = 0; x <= currentSineWidth; x++) {
+                const stepAngle = (x / sineGraph.width) * 2 * Math.PI;
+                const plotY = sineGraph.centerY - Math.sin(stepAngle) * sineGraph.height;
+                if (x === 0) ctx.moveTo(sineGraph.startX, plotY);
+                else ctx.lineTo(sineGraph.startX + x, plotY);
+            }
+            ctx.strokeStyle = '#06b6d4'; 
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            const sineIndicatorX = sineGraph.startX + currentSineWidth;
+            const sineIndicatorY = circleY; 
+            ctx.beginPath();
+            ctx.arc(sineIndicatorX, sineIndicatorY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#06b6d4';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillText("y = sen(θ)", sineGraph.endX - 52, sineGraph.centerY - sineGraph.height - 6);
+
+            // 5. GRAFICA DE LA FUNCIÓN COSENO (DERECHA - ABAJO) [POSICIÓN NORMAL]
+            drawArrow(ctx, cosineGraph.startX - 10, cosineGraph.centerY, cosineGraph.endX + 15, cosineGraph.centerY, '#475569'); 
+            drawArrow(ctx, cosineGraph.startX, cosineGraph.centerY + cosineGraph.height + 10, cosineGraph.startX, cosineGraph.centerY - cosineGraph.height - 10, '#475569'); 
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cosineGraph.startX, cosineGraph.centerY - cosineGraph.height);
+            ctx.lineTo(cosineGraph.endX, cosineGraph.centerY - cosineGraph.height);
+            ctx.moveTo(cosineGraph.startX, cosineGraph.centerY + cosineGraph.height);
+            ctx.lineTo(cosineGraph.endX, cosineGraph.centerY + cosineGraph.height);
+            ctx.stroke();
+
+            ctx.font = '9px sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText("1", cosineGraph.startX - 10, cosineGraph.centerY - cosineGraph.height + 3);
+            ctx.fillText("-1", cosineGraph.startX - 14, cosineGraph.centerY + cosineGraph.height + 3);
+            ctx.fillText("π", cosineGraph.startX + cosineGraph.width / 2 - 3, cosineGraph.centerY + 12);
+            ctx.fillText("2π", cosineGraph.startX + cosineGraph.width - 6, cosineGraph.centerY + 12);
+
+            // Curva de fondo
+            ctx.beginPath();
+            for (let x = 0; x <= cosineGraph.width; x++) {
+                const stepAngle = (x / cosineGraph.width) * 2 * Math.PI;
+                const plotY = cosineGraph.centerY - Math.cos(stepAngle) * cosineGraph.height;
+                if (x === 0) ctx.moveTo(cosineGraph.startX, plotY);
+                else ctx.lineTo(cosineGraph.startX + x, plotY);
+            }
+            ctx.strokeStyle = '#4c0519'; 
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Curva activa
+            const currentCosineWidth = (angle / (2 * Math.PI)) * cosineGraph.width;
+            ctx.beginPath();
+            for (let x = 0; x <= currentCosineWidth; x++) {
+                const stepAngle = (x / cosineGraph.width) * 2 * Math.PI;
+                const plotY = cosineGraph.centerY - Math.cos(stepAngle) * cosineGraph.height;
+                if (x === 0) ctx.moveTo(cosineGraph.startX, plotY);
+                else ctx.lineTo(cosineGraph.startX + x, plotY);
+            }
+            ctx.strokeStyle = '#f43f5e'; 
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            const cosineIndicatorX = cosineGraph.startX + currentCosineWidth;
+            const cosineIndicatorY = cosineGraph.centerY - cosTheta * cosineGraph.height;
+            ctx.beginPath();
+            ctx.arc(cosineIndicatorX, cosineIndicatorY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#f43f5e';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillText("y = cos(θ)", cosineGraph.endX - 52, cosineGraph.centerY - cosineGraph.height - 6);
+
+            // 6. LÍNEAS DE PROYECCIÓN REFLEJADAS
+            if (showTraces) {
+                ctx.lineWidth = 1.2;
+                ctx.setLineDash([3, 3]);
+
+                // Proyección del Seno
+                ctx.beginPath();
+                ctx.moveTo(circleX, circleY);
+                ctx.lineTo(sineIndicatorX, sineIndicatorY);
+                ctx.strokeStyle = 'rgba(6, 182, 212, 0.55)'; 
+                ctx.stroke();
+
+                // Proyección del Coseno (con choque en espejo)
+                const diagonalCollisionY = reflectionCenter.y - (circleX - reflectionCenter.x);
+                
+                ctx.beginPath();
+                ctx.moveTo(circleX, circleY);
+                ctx.lineTo(circleX, diagonalCollisionY);
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.55)'; 
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(circleX, diagonalCollisionY, 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(circleX, diagonalCollisionY);
+                ctx.lineTo(cosineIndicatorX, cosineIndicatorY);
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.55)'; 
+                ctx.stroke();
+
+                ctx.setLineDash([]); 
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Cargar primera pregunta del quiz
+        function loadQuizQuestion() {
+            if (!quizQuestionText || !quizOptions || !quizFeedback) return;
+            const quiz = quizBank[currentQuizIndex];
+            quizQuestionText.textContent = quiz.q;
+            quizOptions.innerHTML = "";
+            quizFeedback.textContent = "Haz tu elección";
+            quizFeedback.className = "font-medium text-slate-400 text-[10px]";
+
+            quiz.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "py-1.5 px-2 bg-slate-950/60 hover:bg-indigo-950/40 text-slate-300 rounded border border-slate-800 text-left transition text-[11px] font-mono leading-tight";
+                btn.textContent = opt;
+                btn.onclick = () => verifyAnswer(btn, opt, quiz.answer);
+                quizOptions.appendChild(btn);
+            });
+        }
+
+        function verifyAnswer(buttonElement, chosen, correct) {
+            if (!quizOptions || !quizFeedback) return;
+            const allButtons = quizOptions.querySelectorAll("button");
+            allButtons.forEach(btn => btn.disabled = true); 
+
+            if (chosen === correct) {
+                buttonElement.className = "py-1.5 px-2 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/50 text-left text-[11px] font-bold";
+                quizFeedback.textContent = "¡Correcto! Excelente análisis.";
+                quizFeedback.className = "font-bold text-emerald-400 text-[10px]";
+            } else {
+                buttonElement.className = "py-1.5 px-2 bg-rose-500/20 text-rose-300 rounded border border-rose-500/50 text-left text-[11px] font-bold";
+                quizFeedback.textContent = `Incorrecto. Correcto: ${correct}`;
+                quizFeedback.className = "font-bold text-rose-400 text-[10px]";
+                
+                allButtons.forEach(btn => {
+                    if (btn.textContent === correct) {
+                        btn.className = "py-1.5 px-2 bg-emerald-500/10 text-emerald-300 rounded border border-emerald-500/30 text-left text-[11px] font-mono";
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
